@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RaRe Home 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm architect's presentation model, practical for a couple planning interiors
+IDEA: a scale model on a studio table with a finishes board beside it
+PICTURE: the live 3D flat itself, filling the stage
+COLOUR and TYPE: plaster white and graphite, brick red accent (from the red X on the site photo); Outfit + Inter
+LAYOUT: model stage left, finishes rail right; stacks model-then-controls under 820px */
+:root{color-scheme:light dark;--bg:light-dark(#f3f1ed,#141518);--panel:light-dark(#ffffff,#1d1e22);--ink:light-dark(#1d1f24,#ecebe8);--mute:light-dark(#62646a,#a6a7ab);--line:light-dark(#e3e0da,#34363b);--acc:#c9402a;--stage:light-dark(#e9e5de,#25272c);--glass:light-dark(rgba(255,255,255,.9),rgba(29,30,34,.88))}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:100vh;height:100dvh}
+.stage{position:relative;background:var(--stage);overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+.head{position:absolute;left:20px;top:16px;pointer-events:none;max-width:55%}
+.head h1{font:600 30px/1.05 Outfit,sans-serif;margin:0;text-wrap:balance}
+.head p{margin:4px 0 0;color:var(--mute)}
+.head p b{color:var(--ink);font-weight:600}
+.views{position:absolute;right:16px;top:16px;display:flex;gap:2px;background:var(--glass);backdrop-filter:blur(8px);border-radius:999px;padding:4px;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+.views button{min-height:40px;padding:0 15px;border-radius:999px;border:0;background:none;font-weight:500;white-space:nowrap}
+.views button.on{background:var(--ink);color:var(--panel)}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lb{position:absolute;left:0;top:0;background:var(--glass);border-radius:7px;padding:3px 8px;text-align:center;white-space:nowrap;font-size:13px;line-height:1.25;pointer-events:auto;cursor:pointer;border:0;box-shadow:0 1px 6px rgba(0,0,0,.1)}
+.lb.sel{box-shadow:0 0 0 2px var(--acc)}
+.lb b{display:block;font-weight:600}.lb span{color:var(--mute)}
+.hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--glass);padding:7px 14px;border-radius:999px;font-size:13px;color:var(--mute);white-space:nowrap;pointer-events:none}
+.load{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);pointer-events:none}
+.toast{position:absolute;left:50%;top:76px;transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:9px 16px;border-radius:10px;font-size:14px;max-width:90%;text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:1}
+.pad{position:absolute;left:16px;bottom:16px;display:none;grid-template-columns:repeat(3,48px);gap:6px}
+.pad.on{display:grid}
+.pad button{height:48px;border-radius:12px;border:0;background:var(--glass);box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:18px;touch-action:none;user-select:none;-webkit-user-select:none}
+.pad .f{grid-column:2}.pad .l{grid-column:1;grid-row:2}.pad .b{grid-column:2;grid-row:2}.pad .r{grid-column:3;grid-row:2}
+.panel{background:var(--panel);border-left:1px solid var(--line);overflow:auto;padding:20px 20px 28px}
+.panel section{padding:2px 0 18px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.panel section:last-child{border:0;margin:0}
+h2{font:600 17px/1.2 Outfit,sans-serif;margin:0 0 10px}
+h3{font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--mute)}
+.note{color:var(--mute);font-size:13px;margin:8px 0 0}
+.dlist{display:grid;gap:6px}
+.drow{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:none;text-align:left;width:100%}
+.drow.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.drow .nm{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .tag{font-size:13px;color:var(--mute)}
+.dact{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.btn{min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:none;font-size:14px;font-weight:500}
+.btn.pri{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.warn{border-color:var(--acc);color:var(--acc)}
+.btn:disabled{opacity:.4;cursor:default}
+.ren[hidden]{display:none}.ren{display:flex;gap:6px;margin-top:10px}.ren input{flex:1;min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px;background:none;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:none;font-size:14px}
+.chip.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.themes{display:grid;gap:8px}
+.th{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:none;text-align:left}
+.th.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.th b{display:block;font-weight:600}.th span.d{display:block;color:var(--mute);font-size:13px;line-height:1.35}
+.th .sw{display:flex;border-radius:8px;overflow:hidden;width:54px;height:40px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.th .sw i{flex:1}
+.paints{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.paint{aspect-ratio:1;border-radius:8px;border:1px solid rgba(0,0,0,.12);padding:0;min-height:36px}
+.paint.on{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--acc)}
+.paint.custom{position:relative;overflow:hidden;background:conic-gradient(#e7b9a5,#e8dfa8,#b9d8b5,#a9c8de,#c9b4dc,#e7b9a5)}
+.paint.custom input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.fins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.fin{border:1px solid var(--line);border-radius:10px;background:none;padding:4px;font-size:13px;line-height:1.2;text-align:center}
+.fin canvas{display:block;width:100%;aspect-ratio:1.4;border-radius:6px;margin-bottom:4px}
+.fin.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.seg{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{min-height:44px;border:0;background:none;font-size:14px;padding:4px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--acc);color:#fff}
+.tog label{display:flex;align-items:center;justify-content:space-between;min-height:42px;cursor:pointer}
+.tog input{width:20px;height:20px;accent-color:var(--acc)}
+.off{opacity:.45;pointer-events:none}
+@media(max-width:820px){
+ .app{grid-template-columns:1fr;height:auto}
+ .stage{height:66vh;min-height:400px}
+ .panel{border-left:0;border-top:1px solid var(--line)}
+ .head{max-width:90%}.head h1{font-size:23px}
+ .views{top:auto;bottom:14px;right:auto;left:50%;transform:translateX(-50%)}
+ .views button{padding:0 12px;font-size:14px}
+ .hint{display:none}.pad{bottom:74px}
+}
+@media(max-width:600px){.lb span{display:none}.lb{padding:2px 6px}}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="stage" id="stage">
+  <canvas id="cv" tabindex="0" aria-label="3D model of the flat"></canvas>
+  <div id="labels"></div>
+  <div class="load" id="load">Loading the 3D model…</div>
+  <div class="head"><h1>Our flat in 3D</h1><p>2.5 BHK · 912 sq ft · <b id="curName">As built</b></p></div>
+  <div class="views">
+   <button data-v="orbit" class="on">3D model</button><button data-v="plan">Top view</button><button data-v="walk">Walk through</button>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="hint" id="hint"></div>
+  <div class="pad" id="pad" aria-label="Walk controls">
+   <button class="f" data-k="f" aria-label="Forward">↑</button><button class="l" data-k="l" aria-label="Turn left">↺</button><button class="b" data-k="b" aria-label="Back">↓</button><button class="r" data-k="r" aria-label="Turn right">↻</button>
+  </div>
+ </div>
+ <aside class="panel">
+  <section>
+   <h2>Designs</h2>
+   <div class="dlist" id="dlist"></div>
+   <div class="dact">
+    <button class="btn pri" id="bNew">New design</button><button class="btn" id="bRen">Rename</button><button class="btn" id="bDel">Delete</button>
+   </div>
+   <div class="ren" id="renBox" hidden><input id="renIn" maxlength="40" aria-label="Design name"><button class="btn pri" id="renOk">Save</button></div>
+   <p class="note" id="saveNote">As built is the original flat and can't be changed. Any edit you make to it starts a new design.</p>
+  </section>
+  <section>
+   <h2>Style for the whole flat</h2>
+   <div class="themes" id="themes"></div>
+   <h3>Feature wall colour</h3>
+   <div class="paints" id="accPaints"></div>
+  </section>
+  <section>
+   <h2>Room finishes</h2>
+   <div class="chips" id="rooms"></div>
+   <h3 id="wallH">Wall paint</h3>
+   <div class="paints" id="paints"></div>
+   <h3 id="floorH">Floor</h3>
+   <div class="fins" id="fins"></div>
+  </section>
+  <section>
+   <h2>Kitchen half-wall</h2>
+   <div class="seg" id="kseg"><button data-k="keep">As built</button><button data-k="open">Removed</button><button data-k="bar">Breakfast bar</button></div>
+   <p class="note">The wall you marked with the red X, between kitchen and dining. The beam above the opening stays in every option.</p>
+  </section>
+  <section class="tog">
+   <h2>View</h2>
+   <h3 style="margin-top:0">Light</h3>
+   <div class="seg" id="lseg" style="--n:2"><button data-l="day">Daytime</button><button data-l="eve">Evening</button></div>
+   <h3>Render quality</h3>
+   <div class="seg" id="qseg" style="--n:2"><button data-q="std">Standard</button><button data-q="hi">High</button></div>
+   <label id="furnRow" style="margin-top:8px">Furniture <input type="checkbox" id="tFurn"></label>
+   <label>Room names and sizes <input type="checkbox" id="tLab"></label>
+   <label>Feature walls <input type="checkbox" id="tAcc"></label>
+   <label id="cutRow">Cut-away walls <input type="checkbox" id="tCut"></label>
+  </section>
+  <section>
+   <h2>About this model</h2>
+   <p class="note" style="margin-top:0">Built from the builder's Wing B, 2.5 BHK Type-1 plan (74.5 m² carpet + sit-outs and dry balcony). Room sizes follow the brochure. Wall thickness, window sizes and the 2.85 m ceiling are estimates, so measure on site before ordering anything made to measure. Paint and floor colours are approximate on screen.</p>
+  </section>
+ </aside>
+</div>
+<script>
+addEventListener('error',e=>{const l=document.getElementById('load');if(l&&l.style.display!=='none')l.textContent='The 3D model could not load: '+(e.message||(e.target&&e.target.src?'could not fetch '+e.target.src:'unknown error'))+'. Reload the page, or send this message to Claude.'},true);
+</script>
+<script src="app.js" onerror="document.getElementById('load').textContent='The 3D engine file did not download. Reload the page, or send this message to Claude.'"></script>
+
+</body>
+</html>
